@@ -1,6 +1,5 @@
 import Base.BaseTest;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -8,12 +7,12 @@ import java.util.Map;
 
 public class UserTests extends BaseTest {
 
-    @Test(description = "Get - /v2/user - User Info", dependsOnMethods = "CreateUser")
+    @Test(description = "Get - /v2/user - User Info",priority = 2)
     public void GetUserInfo (){
         Get(URL+"/v2/user/ismailAydemir9");
     }
 
-    @Test(description = "Post - /v2/user - User Create")
+    @Test(description = "Post - /v2/user - User Create",priority = 1)
     public void CreateUser(){
         Map<String,Object> headersPayload = new HashMap<>();
         headersPayload.put("accept","application/json");
@@ -32,7 +31,7 @@ public class UserTests extends BaseTest {
         Post(URL+"/v2/user",bodyPayload,headersPayload);
     }
 
-    @Test(description = "PUT - /v2/user/ - Update User", dependsOnMethods = "CreateUser")
+    @Test(description = "PUT - /v2/user/ - Update User", priority = 3)
     public  void UpdateUser(){
         Map<String,Object> headersPayload = new HashMap<>();
         headersPayload.put("accept","application/json");
@@ -51,11 +50,11 @@ public class UserTests extends BaseTest {
         Put(URL+"/v2/user/ismailAydemir9",bodyPayload,headersPayload);
     }
 
-    @Test(description = "Delete - /v2/user/ - Delete User",dependsOnMethods = "CreateUser")
+
+    @Test(description = "Delete - /v2/user/ - Delete User",priority = 4)
     public void DeleteUser(){
 
-        Delete(URL+"/v2/user/ismailAydemir9");
-
+        Delete(URL+"/v2/user/ismailAydemir10");
     }
 
     @Test(description = "Get - /v2/user/login - Login")
@@ -72,5 +71,34 @@ public class UserTests extends BaseTest {
     public void Logout(){
 
         Get(URL+"/v2/user/logout");
+    }
+
+    @Test(description = "Get - UserInfoControl")
+    public void UserInfoControl(){
+        Map<String,Object> headersPayload = new HashMap<>();
+        headersPayload.put("accept","application/json");
+        headersPayload.put("Content-Type","application/json");
+
+        Map<String,Object> bodyPayload=new HashMap<>();
+        bodyPayload.put("id","664852314");
+        bodyPayload.put("username","yusufcokal");
+        bodyPayload.put("firstName","yusuf");
+        bodyPayload.put("lastName","cokal");
+        bodyPayload.put("email","yusuf@gmail.com");
+        bodyPayload.put("password","Deneme1");
+        bodyPayload.put("phone","55547893");
+        bodyPayload.put("userStatus","1");
+
+        Post(URL+"/v2/user",bodyPayload,headersPayload);
+        Response response = Get(URL +"/v2/user/yusufcokal");
+
+        AssertEquals(response.jsonPath().getString("id"),"664852314");
+        AssertEquals(response.jsonPath().getString("username"),"yusufcokal");
+        AssertEquals(response.jsonPath().getString("firstName"),"yusuf");
+        AssertEquals(response.jsonPath().getString("lastName"),"cokal");
+        AssertEquals(response.jsonPath().getString("email"),"yusuf@gmail.com");
+        AssertEquals(response.jsonPath().getString("password"),"Deneme1");
+        AssertEquals(response.jsonPath().getString("phone"),"55547893");
+        AssertEquals(response.jsonPath().getString("userStatus"),"1");
     }
 }
